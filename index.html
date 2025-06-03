@@ -1,0 +1,173 @@
+
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ابزار انتخاب رنگ هوشمند</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 20px;
+      background: #f4f4f9;
+      direction: rtl;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #222;
+    }
+    .color-picker {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    input[type="color"] {
+      width: 60px;
+      height: 60px;
+      border: none;
+      cursor: pointer;
+      border-radius: 8px;
+      box-shadow: 0 0 5px #aaa;
+      -webkit-appearance: none;
+    }
+    input[type="color"]::-webkit-color-swatch-wrapper {
+      padding: 0;
+    }
+    input[type="color"]::-webkit-color-swatch {
+      border-radius: 8px;
+    }
+    .result {
+      text-align: center;
+      font-size: 18px;
+      padding: 20px;
+      border-radius: 10px;
+      background-color: #fff;
+      box-shadow: 0 0 10px #ccc;
+      max-width: 400px;
+      margin: 0 auto;
+      user-select: none;
+    }
+    .color-swatch {
+      display: inline-block;
+      width: 40px;
+      height: 40px;
+      vertical-align: middle;
+      border-radius: 6px;
+      margin-left: 10px;
+      box-shadow: 0 0 3px #888;
+    }
+  </style>
+</head>
+<body>
+  <h1>ابزار انتخاب رنگ هوشمند</h1>
+  <div class="color-picker">
+    <input type="color" id="color1" value="#ff0000" title="رنگ اول" />
+    <input type="color" id="color2" value="#0000ff" title="رنگ دوم" />
+  </div>
+  <div class="result" id="result">
+    <div>
+      رنگ اول: <span id="color1-value">#ff0000</span>
+      <span class="color-swatch" id="color1-swatch" style="background:#ff0000;"></span>
+    </div>
+    <div>
+      رنگ دوم: <span id="color2-value">#0000ff</span>
+      <span class="color-swatch" id="color2-swatch" style="background:#0000ff;"></span>
+    </div>
+    <hr style="margin:15px 0;" />
+    <div>
+      رنگ میانگین هوشمند:
+      <span id="mixed-color-value">#800080</span>
+      <span class="color-swatch" id="mixed-color-swatch" style="background:#800080;"></span>
+    </div>
+  </div>
+
+  <script>
+    // تبدیل کد هگز به RGB
+    function hexToRgb(hex) {
+      hex = hex.replace('#', '');
+      const bigint = parseInt(hex, 16);
+      return {
+        r: (bigint >> 16) & 255,
+        g: (bigint >> 8) & 255,
+        b: bigint & 255,
+      };
+    }
+
+    // تبدیل RGB به هگز
+    function rgbToHex(r, g, b) {
+      return (
+        '#' +
+        [r, g, b]
+          .map((x) => {
+            const hex = x.toString(16);
+            return hex.length === 1 ? '0' + hex : hex;
+          })
+          .join('')
+      );
+    }
+
+    // میانگین هوشمند رنگ‌ها (با توجه به روشنایی)
+    function smartMixColors(color1, color2) {
+      const c1 = hexToRgb(color1);
+      const c2 = hexToRgb(color2);
+
+      // محاسبه روشنایی (luminance) هر رنگ (فرمول WCAG)
+      function luminance(c) {
+        const a = [c.r, c.g, c.b].map((v) => {
+          v /= 255;
+          return v <= 0.03928
+            ? v / 12.92
+            : Math.pow((v + 0.055) / 1.055, 2.4);
+        });
+        return 0.2126 * a[0] + 0.7152 * a[1] + 0.0722 * a[2];
+      }
+
+      const lum1 = luminance(c1);
+      const lum2 = luminance(c2);
+
+      // وزن‌دهی رنگ‌ها بر اساس روشنایی‌شان
+      const totalLum = lum1 + lum2;
+      const weight1 = lum1 / totalLum;
+      const weight2 = lum2 / totalLum;
+
+      // ترکیب رنگ‌ها با وزن‌دهی روشنایی
+      const r = Math.round(c1.r * weight1 + c2.r * weight2);
+      const g = Math.round(c1.g * weight1 + c2.g * weight2);
+      const b = Math.round(c1.b * weight1 + c2.b * weight2);
+
+      return rgbToHex(r, g, b);
+    }
+
+    const color1Input = document.getElementById('color1');
+    const color2Input = document.getElementById('color2');
+    const color1Value = document.getElementById('color1-value');
+    const color2Value = document.getElementById('color2-value');
+    const color1Swatch = document.getElementById('color1-swatch');
+    const color2Swatch = document.getElementById('color2-swatch');
+    const mixedColorValue = document.getElementById('mixed-color-value');
+    const mixedColorSwatch = document.getElementById('mixed-color-swatch');
+
+    function updateColors() {
+      const c1 = color1Input.value;
+      const c2 = color2Input.value;
+
+      color1Value.textContent = c1;
+      color2Value.textContent = c2;
+      color1Swatch.style.backgroundColor = c1;
+      color2Swatch.style.backgroundColor = c2;
+
+      const mixed = smartMixColors(c1, c2);
+      mixedColorValue.textContent = mixed;
+      mixedColorSwatch.style.backgroundColor = mixed;
+    }
+
+    color1Input.addEventListener('input', updateColors);
+    color2Input.addEventListener('input', updateColors);
+
+    updateColors();
+  </script>
+</body>
+</html>
