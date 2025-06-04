@@ -1,140 +1,195 @@
 <!DOCTYPE html>
 <html lang="fa">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>آزمایش‌گر چیدمان اتاق</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: "Vazirmatn", sans-serif;
-      background: #f8f8f8;
-      direction: rtl;
-    }
-    header {
-      background-color: #4b6cb7;
-      background-image: linear-gradient(to right, #182848, #4b6cb7);
-      color: white;
-      padding: 1rem;
-      text-align: center;
-      font-size: 1.8rem;
-    }
-    .container {
-      max-width: 1000px;
-      margin: 2rem auto;
-      padding: 1rem;
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
-    }
-    .controls {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      margin-bottom: 1.5rem;
-    }
-    .controls div {
-      margin: 0.5rem 0;
-      flex: 1 1 30%;
-    }
-    label {
-      display: block;
-      font-weight: bold;
-      margin-bottom: 0.3rem;
-    }
-    input[type="color"], select {
-      width: 100%;
-      padding: 0.4rem;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-    }
-    #room-preview {
-      width: 100%;
-      border-radius: 10px;
-      overflow: hidden;
-      border: 1px solid #ddd;
-      position: relative;
-    }
-    #room-preview img {
-      width: 100%;
-      height: auto;
-      display: block;
-      mix-blend-mode: multiply;
-    }
-    .overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 2;
-      pointer-events: none;
-    }
-    .layer {
-      width: 100%;
-      height: 100%;
-      opacity: 0.8;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ابزار ترکیب رنگ برای نقاش و دکوراسیون</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Vazirmatn&display=swap');
+  body {
+    font-family: 'Vazirmatn', sans-serif;
+    background: #f9f9f9;
+    margin: 0; padding: 20px;
+    color: #333;
+    direction: rtl;
+  }
+  h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #222;
+  }
+  .color-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+  }
+  .color-card {
+    background: #fff;
+    border-radius: 12px;
+    width: 250px;
+    padding: 15px;
+    box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
+    cursor: pointer;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+  .color-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 10px 20px rgb(0 0 0 / 0.15);
+  }
+  .color-swatch {
+    height: 60px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    box-shadow: inset 0 0 6px rgb(0 0 0 / 0.1);
+  }
+  .color-name {
+    font-weight: 700;
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+  }
+  .details {
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+  .composition {
+    margin-top: 10px;
+    background: #f0f0f0;
+    border-radius: 8px;
+    padding: 10px;
+    font-family: monospace;
+  }
+  .suggestions {
+    margin-top: 12px;
+    font-style: italic;
+    color: #555;
+  }
+  .selected-color {
+    margin-top: 25px;
+    text-align: center;
+  }
+  .selected-color .color-box {
+    width: 160px;
+    height: 160px;
+    margin: 0 auto 15px auto;
+    border-radius: 20px;
+    box-shadow: 0 0 20px rgb(0 0 0 / 0.1);
+  }
+</style>
 </head>
 <body>
-  <header>🛋️ آزمایش‌گر چیدمان اتاق</header>
-  <div class="container">
-    <div class="controls">
-      <div>
-        <label for="wallColor">رنگ دیوار</label>
-        <input type="color" id="wallColor" value="#f0e68c" />
-      </div>
-      <div>
-        <label for="floorColor">رنگ کف</label>
-        <input type="color" id="floorColor" value="#d2b48c" />
-      </div>
-      <div>
-        <label for="ceilingColor">رنگ سقف</label>
-        <input type="color" id="ceilingColor" value="#ffffff" />
-      </div>
-    </div>
-    <div class="controls">
-      <div>
-        <label for="roomStyle">طرح اتاق</label>
-        <select id="roomStyle">
-          <option value="IMG_8167.webp">مدرن</option>
-          <option value="room2.jpg">کلاسیک</option>
-          <option value="room3.jpg">مینیمال</option>
-        </select>
-      </div>
-    </div>
-    <div id="room-preview">
-      <img id="baseImage" src="room1.jpg" alt="Room preview" />
-      <div class="overlay">
-        <div class="layer" id="wallLayer"></div>
-        <div class="layer" id="floorLayer"></div>
-        <div class="layer" id="ceilingLayer"></div>
-      </div>
-    </div>
-  </div>
-  <script>
-    const wallColorInput = document.getElementById("wallColor");
-    const floorColorInput = document.getElementById("floorColor");
-    const ceilingColorInput = document.getElementById("ceilingColor");
-    const roomStyleSelect = document.getElementById("roomStyle");
-    const baseImage = document.getElementById("baseImage");
 
-    function updateColors() {
-      document.getElementById("wallLayer").style.background = wallColorInput.value;
-      document.getElementById("floorLayer").style.background = floorColorInput.value;
-      document.getElementById("ceilingLayer").style.background = ceilingColorInput.value;
-    }
+<h1>ابزار ترکیب رنگ - نقاش و دکوراسیون داخلی</h1>
 
-    wallColorInput.addEventListener("input", updateColors);
-    floorColorInput.addEventListener("input", updateColors);
-    ceilingColorInput.addEventListener("input", updateColors);
+<div class="color-list" id="colorList">
+  <!-- کارت‌های رنگ از JS پر میشه -->
+</div>
 
-    roomStyleSelect.addEventListener("change", () => {
-      baseImage.src = roomStyleSelect.value;
+<div class="selected-color" id="selectedColor" style="display:none;">
+  <div class="color-box" id="colorBox"></div>
+  <h2 id="selectedColorName"></h2>
+  <div class="composition" id="colorComposition"></div>
+  <div class="details" id="colorDetails"></div>
+  <div class="suggestions" id="colorSuggestions"></div>
+</div>
+
+<script>
+  const colors = [
+    {
+      name: 'سفید صدفی',
+      hex: '#F0F0F0',
+      composition: [
+        {color: 'سفید', percent: 85, hex:'#FFFFFF'},
+        {color: 'خاکستری روشن', percent: 10, hex:'#D3D3D3'},
+        {color: 'آبی خیلی کم', percent: 5, hex:'#E6F0FA'},
+      ],
+      details: 'سفید صدفی کمی گرم‌تر است و حس آرامش را به فضا اضافه می‌کند. مناسب اتاق‌های خواب و سالن‌های پذیرایی.',
+      suggestions: 'با رنگ‌های چوبی گرم و سبز زیتونی ترکیب خوبی می‌سازد.'
+    },
+    {
+      name: 'سفید یخچالی',
+      hex: '#E6F2FF',
+      composition: [
+        {color: 'سفید', percent: 90, hex:'#FFFFFF'},
+        {color: 'آبی خیلی کم', percent: 7, hex:'#D0E6FF'},
+        {color: 'خاکستری خیلی روشن', percent: 3, hex:'#F2F6FA'},
+      ],
+      details: 'سفید یخچالی سرد و تمیز است، مناسب فضاهای مدرن و اداری.',
+      suggestions: 'با رنگ‌های خاکستری و آبی تیره کنتراست زیبایی ایجاد می‌کند.'
+    },
+    {
+      name: 'زرد پرتقالی',
+      hex: '#FFA500',
+      composition: [
+        {color: 'زرد', percent: 70, hex:'#FFD700'},
+        {color: 'قرمز', percent: 30, hex:'#FF4500'}
+      ],
+      details: 'زرد پرتقالی رنگی گرم و انرژی‌زا، مناسب فضای آشپزخانه و سالن‌های پرنور.',
+      suggestions: 'با رنگ‌های سفید صدفی و قهوه‌ای چوبی بسیار زیبا می‌شود.'
+    },
+    {
+      name: 'آبی نفتی',
+      hex: '#004B66',
+      composition: [
+        {color: 'آبی تیره', percent: 75, hex:'#003366'},
+        {color: 'سبز', percent: 25, hex:'#007A70'}
+      ],
+      details: 'رنگی آرامش‌بخش و رسمی، مناسب دفاتر کار و فضاهای نشیمن.',
+      suggestions: 'با رنگ‌های خاکستری روشن و سفید ترکیب کلاسیکی دارد.'
+    },
+  ];
+
+  const colorListEl = document.getElementById('colorList');
+  const selectedColorEl = document.getElementById('selectedColor');
+  const colorBoxEl = document.getElementById('colorBox');
+  const selectedColorNameEl = document.getElementById('selectedColorName');
+  const colorCompositionEl = document.getElementById('colorComposition');
+  const colorDetailsEl = document.getElementById('colorDetails');
+  const colorSuggestionsEl = document.getElementById('colorSuggestions');
+
+  function createColorCard(color) {
+    const card = document.createElement('div');
+    card.className = 'color-card';
+    card.onclick = () => showColorDetails(color);
+
+    const swatch = document.createElement('div');
+    swatch.className = 'color-swatch';
+    swatch.style.backgroundColor = color.hex;
+    card.appendChild(swatch);
+
+    const name = document.createElement('div');
+    name.className = 'color-name';
+    name.textContent = color.name;
+    card.appendChild(name);
+
+    return card;
+  }
+
+  function showColorDetails(color) {
+    selectedColorEl.style.display = 'block';
+    colorBoxEl.style.background = color.hex;
+    selectedColorNameEl.textContent = color.name;
+
+    // ترکیب رنگ‌ها به صورت متن
+    let compText = '';
+    color.composition.forEach(c => {
+      compText += `${c.percent}% ${c.color} (${c.hex})\n`;
     });
+    colorCompositionEl.textContent = compText.trim();
 
-    window.onload = updateColors;
-  </script>
+    colorDetailsEl.textContent = color.details;
+    colorSuggestionsEl.textContent = `پیشنهاد: ${color.suggestions}`;
+
+    // اسکرول به سمت پایین برای دیدن جزییات
+    selectedColorEl.scrollIntoView({behavior: 'smooth'});
+  }
+
+  // بارگذاری کارت‌ها
+  colors.forEach(color => {
+    const card = createColorCard(color);
+    colorListEl.appendChild(card);
+  });
+</script>
+
 </body>
 </html>
