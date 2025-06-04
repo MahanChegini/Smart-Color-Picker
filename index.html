@@ -2,454 +2,139 @@
 <html lang="fa">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ابزار انتخاب رنگ هوشمند | Smart Color Picker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>آزمایش‌گر چیدمان اتاق</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap');
-    /* Reset */
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
     body {
-      font-family: 'Vazirmatn', sans-serif;
-      background: #f0f2f5;
-      color: #333;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 20px;
-      transition: background 0.3s, color 0.3s;
+      margin: 0;
+      font-family: "Vazirmatn", sans-serif;
+      background: #f8f8f8;
+      direction: rtl;
     }
-    h1 {
-      margin-bottom: 15px;
-      font-weight: 700;
-      color: #222;
+    header {
+      background-color: #4b6cb7;
+      background-image: linear-gradient(to right, #182848, #4b6cb7);
+      color: white;
+      padding: 1rem;
+      text-align: center;
+      font-size: 1.8rem;
     }
     .container {
-      max-width: 900px;
-      width: 100%;
+      max-width: 1000px;
+      margin: 2rem auto;
+      padding: 1rem;
       background: white;
       border-radius: 12px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-      padding: 20px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 25px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
     }
-    /* بخش آپلود عکس */
-    .upload-area {
-      border: 2px dashed #888;
-      border-radius: 12px;
-      padding: 40px 20px;
-      text-align: center;
-      cursor: pointer;
-      color: #666;
-      transition: border-color 0.3s, color 0.3s;
-    }
-    .upload-area:hover {
-      border-color: #4a90e2;
-      color: #4a90e2;
-    }
-    .upload-area input {
-      display: none;
-    }
-    .upload-area.dragover {
-      border-color: #357ABD;
-      color: #357ABD;
-      background: #e6f0ff;
-    }
-    /* نمایش پالت رنگ */
-    .palette {
+    .controls {
       display: flex;
       flex-wrap: wrap;
-      gap: 15px;
-      justify-content: center;
-      align-items: center;
-      min-height: 160px;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
     }
-    .color-box {
-      flex: 1 1 80px;
-      height: 80px;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      cursor: pointer;
-      position: relative;
-      transition: transform 0.2s ease;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      padding: 8px;
-      color: #fff;
-      font-weight: 600;
-      user-select: none;
+    .controls div {
+      margin: 0.5rem 0;
+      flex: 1 1 30%;
     }
-    .color-box:hover {
-      transform: scale(1.1);
-      box-shadow: 0 6px 15px rgba(0,0,0,0.2);
-    }
-    .color-label {
-      background: rgba(0,0,0,0.35);
-      border-radius: 6px;
-      padding: 3px 6px;
-      font-size: 14px;
-      text-align: center;
-    }
-    /* نمایش کد رنگ */
-    .color-code {
-      font-family: monospace;
-      margin-top: 4px;
-      font-size: 12px;
-      cursor: pointer;
-      opacity: 0.85;
-      user-select: all;
-    }
-    .color-code:hover {
-      opacity: 1;
-    }
-    /* اطلاعات رنگ منتخب */
-    .details {
-      grid-column: 1 / -1;
-      background: #f9fafb;
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: inset 0 0 10px rgba(0,0,0,0.03);
-      display: flex;
-      flex-wrap: wrap;
-      gap: 15px;
-      align-items: center;
-      justify-content: center;
-    }
-    .selected-color {
-      width: 100px;
-      height: 100px;
-      border-radius: 20px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-      flex-shrink: 0;
-      transition: background 0.3s;
-    }
-    .color-info {
-      flex-grow: 1;
-      font-size: 16px;
-      color: #444;
-      direction: ltr;
-    }
-    .color-info b {
+    label {
       display: block;
-      margin-bottom: 6px;
-      font-weight: 700;
-      font-size: 18px;
-      color: #222;
+      font-weight: bold;
+      margin-bottom: 0.3rem;
     }
-    /* دکمه کپی */
-    button.copy-btn {
-      padding: 8px 16px;
-      border: none;
-      background: #4a90e2;
-      color: white;
-      font-weight: 700;
+    input[type="color"], select {
+      width: 100%;
+      padding: 0.4rem;
+      border: 1px solid #ccc;
       border-radius: 8px;
-      cursor: pointer;
-      transition: background 0.25s ease;
-      user-select: none;
     }
-    button.copy-btn:hover {
-      background: #357ABD;
-    }
-    /* حالت تاریک */
-    body.dark {
-      background: #1f2128;
-      color: #ddd;
-    }
-    body.dark .container {
-      background: #282c34;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.8);
-    }
-    body.dark .upload-area {
-      border-color: #aaa;
-      color: #aaa;
-    }
-    body.dark .upload-area:hover {
-      border-color: #71aaff;
-      color: #71aaff;
-    }
-    body.dark .palette {
-      /* رنگ پس‌زمینه را تغییری نمی‌دهیم */
-    }
-    body.dark .color-box {
-      box-shadow: 0 2px 8px rgba(255,255,255,0.1);
-    }
-    body.dark .color-label {
-      background: rgba(255,255,255,0.2);
-    }
-    body.dark .color-info {
-      color: #bbb;
-    }
-    body.dark button.copy-btn {
-      background: #5390ff;
-    }
-    body.dark button.copy-btn:hover {
-      background: #71aaff;
-    }
-    /* سوییچ حالت تاریک */
-    .dark-toggle {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      cursor: pointer;
-      background: #4a90e2;
-      padding: 8px 12px;
+    #room-preview {
+      width: 100%;
       border-radius: 10px;
-      color: white;
-      font-weight: 700;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-      user-select: none;
-      transition: background 0.3s ease;
-      z-index: 1000;
+      overflow: hidden;
+      border: 1px solid #ddd;
+      position: relative;
     }
-    .dark-toggle:hover {
-      background: #357ABD;
+    #room-preview img {
+      width: 100%;
+      height: auto;
+      display: block;
+      mix-blend-mode: multiply;
+    }
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+      pointer-events: none;
+    }
+    .layer {
+      width: 100%;
+      height: 100%;
+      opacity: 0.8;
     }
   </style>
 </head>
 <body>
-  <div class="dark-toggle" id="darkToggle">🌙 حالت تاریک</div>
-
-  <h1>ابزار انتخاب رنگ هوشمند</h1>
-
+  <header>🛋️ آزمایش‌گر چیدمان اتاق</header>
   <div class="container">
-    <label class="upload-area" id="uploadArea" tabindex="0">
-      <input type="file" id="imageUpload" accept="image/*" />
-      کشیدن و رها کردن یا کلیک کنید و تصویر آپلود کنید
-    </label>
-
-    <div class="palette" id="palette">
-      <!-- رنگ‌ها اینجا نمایش داده می‌شوند -->
-      <p style="width:100%; text-align:center; color:#999; margin-top:30px;">رنگ‌ها اینجا نمایش داده می‌شوند</p>
+    <div class="controls">
+      <div>
+        <label for="wallColor">رنگ دیوار</label>
+        <input type="color" id="wallColor" value="#f0e68c" />
+      </div>
+      <div>
+        <label for="floorColor">رنگ کف</label>
+        <input type="color" id="floorColor" value="#d2b48c" />
+      </div>
+      <div>
+        <label for="ceilingColor">رنگ سقف</label>
+        <input type="color" id="ceilingColor" value="#ffffff" />
+      </div>
     </div>
-
-    <div class="details" id="colorDetails" style="display:none;">
-      <div class="selected-color" id="selectedColor"></div>
-      <div class="color-info" id="colorInfo">
-        <b>اطلاعات رنگ انتخاب شده</b>
-        <div>HEX: <span id="hexCode"></span> <button class="copy-btn" data-copy-target="hexCode">کپی</button></div>
-        <div>RGB: <span id="rgbCode"></span> <button class="copy-btn" data-copy-target="rgbCode">کپی</button></div>
-        <div>HSL: <span id="hslCode"></span> <button class="copy-btn" data-copy-target="hslCode">کپی</button></div>
+    <div class="controls">
+      <div>
+        <label for="roomStyle">طرح اتاق</label>
+        <select id="roomStyle">
+          <option value="room1.jpg">مدرن</option>
+          <option value="room2.jpg">کلاسیک</option>
+          <option value="room3.jpg">مینیمال</option>
+        </select>
+      </div>
+    </div>
+    <div id="room-preview">
+      <img id="baseImage" src="room1.jpg" alt="Room preview" />
+      <div class="overlay">
+        <div class="layer" id="wallLayer"></div>
+        <div class="layer" id="floorLayer"></div>
+        <div class="layer" id="ceilingLayer"></div>
       </div>
     </div>
   </div>
-
   <script>
-    const uploadArea = document.getElementById('uploadArea');
-    const imageUpload = document.getElementById('imageUpload');
-    const palette = document.getElementById('palette');
-    const colorDetails = document.getElementById('colorDetails');
-    const selectedColor = document.getElementById('selectedColor');
-    const hexCode = document.getElementById('hexCode');
-    const rgbCode = document.getElementById('rgbCode');
-    const hslCode = document.getElementById('hslCode');
-    const darkToggle = document.getElementById('darkToggle');
+    const wallColorInput = document.getElementById("wallColor");
+    const floorColorInput = document.getElementById("floorColor");
+    const ceilingColorInput = document.getElementById("ceilingColor");
+    const roomStyleSelect = document.getElementById("roomStyle");
+    const baseImage = document.getElementById("baseImage");
 
-    // فعال‌سازی حالت تاریک
-    darkToggle.onclick = () => {
-      document.body.classList.toggle('dark');
-      if (document.body.classList.contains('dark')) {
-        darkToggle.textContent = '☀️ حالت روشن';
-      } else {
-        darkToggle.textContent = '🌙 حالت تاریک';
-      }
-    };
+    function updateColors() {
+      document.getElementById("wallLayer").style.background = wallColorInput.value;
+      document.getElementById("floorLayer").style.background = floorColorInput.value;
+      document.getElementById("ceilingLayer").style.background = ceilingColorInput.value;
+    }
 
-    // Drag & Drop Events
-    uploadArea.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      uploadArea.classList.add('dragover');
-    });
-    uploadArea.addEventListener('dragleave', (e) => {
-      e.preventDefault();
-      uploadArea.classList.remove('dragover');
-    });
-    uploadArea.addEventListener('drop', (e) => {
-      e.preventDefault();
-      uploadArea.classList.remove('dragover');
-      const file = e.dataTransfer.files[0];
-      if (file && file.type.startsWith('image/')) {
-        processImageFile(file);
-      }
+    wallColorInput.addEventListener("input", updateColors);
+    floorColorInput.addEventListener("input", updateColors);
+    ceilingColorInput.addEventListener("input", updateColors);
+
+    roomStyleSelect.addEventListener("change", () => {
+      baseImage.src = roomStyleSelect.value;
     });
 
-    uploadArea.addEventListener('click', () => imageUpload.click());
-    imageUpload.addEventListener('change', () => {
-      if (imageUpload.files.length > 0) {
-        processImageFile(imageUpload.files[0]);
-      }
-    });
-
-    // خواندن فایل و استخراج پالت رنگی
-    function processImageFile(file) {
-      const reader = new FileReader();
-      reader.onload = function(event) {
-        const img = new Image();
-        img.onload = () => {
-          extractColors(img);
-        };
-        img.src = event.target.result;
-      };
-      reader.readAsDataURL(file);
-    }
-
-    // استخراج پالت رنگ با میانگین رنگ‌ها + خوشه‌بندی ساده
-    function extractColors(image) {
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      const width = 150; // سایز نمونه‌برداری
-      const height = 150;
-      canvas.width = width;
-      canvas.height = height;
-      ctx.drawImage(image, 0, 0, width, height);
-
-      // گرفتن داده‌های پیکسلی
-      const imgData = ctx.getImageData(0, 0, width, height);
-      const pixels = imgData.data;
-      const pixelCount = width * height;
-
-      // خوشه‌بندی K-means ساده برای استخراج 6 رنگ اصلی
-      const k = 6;
-      let clusters = [];
-      let assignments = new Array(pixelCount);
-      // شروع تصادفی خوشه‌ها
-      for (let i = 0; i < k; i++) {
-        const pxIndex = Math.floor(Math.random() * pixelCount) * 4;
-        clusters[i] = [
-          pixels[pxIndex],
-          pixels[pxIndex + 1],
-          pixels[pxIndex + 2]
-        ];
-      }
-
-      let changed = true;
-      let iterations = 0;
-      while (changed && iterations < 10) {
-        changed = false;
-        // تخصیص پیکسل‌ها به خوشه‌ها
-        for (let i = 0; i < pixelCount; i++) {
-          const r = pixels[i * 4];
-          const g = pixels[i * 4 + 1];
-          const b = pixels[i * 4 + 2];
-          let minDist = Infinity;
-          let bestCluster = 0;
-          for (let c = 0; c < k; c++) {
-            const cr = clusters[c][0];
-            const cg = clusters[c][1];
-            const cb = clusters[c][2];
-            const dist = (r - cr) ** 2 + (g - cg) ** 2 + (b - cb) ** 2;
-            if (dist < minDist) {
-              minDist = dist;
-              bestCluster = c;
-            }
-          }
-          if (assignments[i] !== bestCluster) {
-            assignments[i] = bestCluster;
-            changed = true;
-          }
-        }
-
-        // بروزرسانی خوشه‌ها
-        let sums = new Array(k).fill(null).map(() => [0, 0, 0]);
-        let counts = new Array(k).fill(0);
-        for (let i = 0; i < pixelCount; i++) {
-          const clusterIdx = assignments[i];
-          sums[clusterIdx][0] += pixels[i * 4];
-          sums[clusterIdx][1] += pixels[i * 4 + 1];
-          sums[clusterIdx][2] += pixels[i * 4 + 2];
-          counts[clusterIdx]++;
-        }
-        for (let c = 0; c < k; c++) {
-          if (counts[c] === 0) continue;
-          clusters[c][0] = Math.round(sums[c][0] / counts[c]);
-          clusters[c][1] = Math.round(sums[c][1] / counts[c]);
-          clusters[c][2] = Math.round(sums[c][2] / counts[c]);
-        }
-        iterations++;
-      }
-
-      // نمایش رنگ‌ها
-      showColors(clusters);
-    }
-
-    // نمایش پالت رنگ‌ها
-    function showColors(colors) {
-      palette.innerHTML = '';
-      colors.forEach((rgb, idx) => {
-        const hex = rgbToHex(...rgb);
-        const colorBox = document.createElement('div');
-        colorBox.className = 'color-box';
-        colorBox.style.backgroundColor = hex;
-        colorBox.tabIndex = 0;
-        colorBox.setAttribute('role', 'button');
-        colorBox.setAttribute('aria-label', `رنگ شماره ${idx+1} با کد ${hex}`);
-        colorBox.innerHTML = `
-          <div class="color-label">رنگ ${idx + 1}</div>
-          <div class="color-code">${hex}</div>
-        `;
-        colorBox.addEventListener('click', () => selectColor(rgb));
-        colorBox.addEventListener('keydown', e => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            selectColor(rgb);
-          }
-        });
-        palette.appendChild(colorBox);
-      });
-      colorDetails.style.display = 'none';
-    }
-
-    // انتخاب رنگ و نمایش اطلاعات
-    function selectColor(rgb) {
-      const hex = rgbToHex(...rgb);
-      selectedColor.style.backgroundColor = hex;
-      hexCode.textContent = hex;
-      rgbCode.textContent = `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
-      const hsl = rgbToHsl(...rgb);
-      hslCode.textContent = `hsl(${hsl[0]}, ${hsl[1]}%, ${hsl[2]}%)`;
-      colorDetails.style.display = 'flex';
-    }
-
-    // تبدیل RGB به HEX
-    function rgbToHex(r, g, b) {
-      return "#" + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
-    }
-
-    // تبدیل RGB به HSL
-    function rgbToHsl(r, g, b) {
-      r /= 255; g /= 255; b /= 255;
-      const max = Math.max(r, g, b);
-      const min = Math.min(r, g, b);
-      let h, s, l = (max + min) / 2;
-
-      if(max === min){
-        h = s = 0; // achromatic
-      } else {
-        const d = max - min;
-        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-        switch(max){
-          case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-          case g: h = (b - r) / d + 2; break;
-          case b: h = (r - g) / d + 4; break;
-        }
-        h /= 6;
-      }
-      h = Math.round(h * 360);
-      s = Math.round(s * 100);
-      l = Math.round(l * 100);
-      return [h, s, l];
-    }
-
-    // کپی کردن متن کد رنگ به کلیپ‌بورد
-    document.querySelectorAll('button.copy-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const targetId = btn.getAttribute('data-copy-target');
-        const text = document.getElementById(targetId).textContent;
-        navigator.clipboard.writeText(text).then(() => {
+    window.onload = updateColors;
+  </script>
+</body>
+</html>
