@@ -1,195 +1,186 @@
 <!DOCTYPE html>
 <html lang="fa">
+
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>ابزار ترکیب رنگ برای نقاش و دکوراسیون</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Vazirmatn&display=swap');
-  body {
-    font-family: 'Vazirmatn', sans-serif;
-    background: #f9f9f9;
-    margin: 0; padding: 20px;
-    color: #333;
-    direction: rtl;
-  }
-  h1 {
-    text-align: center;
-    margin-bottom: 20px;
-    color: #222;
-  }
-  .color-list {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px;
-  }
-  .color-card {
-    background: #fff;
-    border-radius: 12px;
-    width: 250px;
-    padding: 15px;
-    box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
-    cursor: pointer;
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
-  }
-  .color-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 10px 20px rgb(0 0 0 / 0.15);
-  }
-  .color-swatch {
-    height: 60px;
-    border-radius: 8px;
-    margin-bottom: 12px;
-    box-shadow: inset 0 0 6px rgb(0 0 0 / 0.1);
-  }
-  .color-name {
-    font-weight: 700;
-    font-size: 1.2rem;
-    margin-bottom: 8px;
-  }
-  .details {
-    font-size: 0.9rem;
-    line-height: 1.4;
-  }
-  .composition {
-    margin-top: 10px;
-    background: #f0f0f0;
-    border-radius: 8px;
-    padding: 10px;
-    font-family: monospace;
-  }
-  .suggestions {
-    margin-top: 12px;
-    font-style: italic;
-    color: #555;
-  }
-  .selected-color {
-    margin-top: 25px;
-    text-align: center;
-  }
-  .selected-color .color-box {
-    width: 160px;
-    height: 160px;
-    margin: 0 auto 15px auto;
-    border-radius: 20px;
-    box-shadow: 0 0 20px rgb(0 0 0 / 0.1);
-  }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>راهنمای ساخت رنگ برای معماران و نقاش‌ها</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Vazirmatn', sans-serif;
+      background-color: #f7fafc;
+    }
+    .card {
+      @apply bg-white p-4 rounded-2xl shadow-md hover:shadow-lg transition-all;
+    }
+  </style>
 </head>
-<body>
 
-<h1>ابزار ترکیب رنگ - نقاش و دکوراسیون داخلی</h1>
+<body class="p-6">
+  <div class="max-w-5xl mx-auto">
+    <h1 class="text-3xl font-bold text-center mb-6">🎨 راهنمای ساخت رنگ + روان‌شناسی</h1>
 
-<div class="color-list" id="colorList">
-  <!-- کارت‌های رنگ از JS پر میشه -->
-</div>
+    <input type="text" id="searchInput" placeholder="جستجوی رنگ..." class="w-full p-3 mb-6 border rounded-xl">
 
-<div class="selected-color" id="selectedColor" style="display:none;">
-  <div class="color-box" id="colorBox"></div>
-  <h2 id="selectedColorName"></h2>
-  <div class="composition" id="colorComposition"></div>
-  <div class="details" id="colorDetails"></div>
-  <div class="suggestions" id="colorSuggestions"></div>
-</div>
+    <div id="colorCards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- رنگ‌ها به صورت داینامیک بارگذاری می‌شوند -->
+    </div>
+  </div>
 
-<script>
-  const colors = [
-    {
-      name: 'سفید صدفی',
-      hex: '#F0F0F0',
-      composition: [
-        {color: 'سفید', percent: 85, hex:'#FFFFFF'},
-        {color: 'خاکستری روشن', percent: 10, hex:'#D3D3D3'},
-        {color: 'آبی خیلی کم', percent: 5, hex:'#E6F0FA'},
-      ],
-      details: 'سفید صدفی کمی گرم‌تر است و حس آرامش را به فضا اضافه می‌کند. مناسب اتاق‌های خواب و سالن‌های پذیرایی.',
-      suggestions: 'با رنگ‌های چوبی گرم و سبز زیتونی ترکیب خوبی می‌سازد.'
-    },
-    {
-      name: 'سفید یخچالی',
-      hex: '#E6F2FF',
-      composition: [
-        {color: 'سفید', percent: 90, hex:'#FFFFFF'},
-        {color: 'آبی خیلی کم', percent: 7, hex:'#D0E6FF'},
-        {color: 'خاکستری خیلی روشن', percent: 3, hex:'#F2F6FA'},
-      ],
-      details: 'سفید یخچالی سرد و تمیز است، مناسب فضاهای مدرن و اداری.',
-      suggestions: 'با رنگ‌های خاکستری و آبی تیره کنتراست زیبایی ایجاد می‌کند.'
-    },
-    {
-      name: 'زرد پرتقالی',
-      hex: '#FFA500',
-      composition: [
-        {color: 'زرد', percent: 70, hex:'#FFD700'},
-        {color: 'قرمز', percent: 30, hex:'#FF4500'}
-      ],
-      details: 'زرد پرتقالی رنگی گرم و انرژی‌زا، مناسب فضای آشپزخانه و سالن‌های پرنور.',
-      suggestions: 'با رنگ‌های سفید صدفی و قهوه‌ای چوبی بسیار زیبا می‌شود.'
-    },
-    {
-      name: 'آبی نفتی',
-      hex: '#004B66',
-      composition: [
-        {color: 'آبی تیره', percent: 75, hex:'#003366'},
-        {color: 'سبز', percent: 25, hex:'#007A70'}
-      ],
-      details: 'رنگی آرامش‌بخش و رسمی، مناسب دفاتر کار و فضاهای نشیمن.',
-      suggestions: 'با رنگ‌های خاکستری روشن و سفید ترکیب کلاسیکی دارد.'
-    },
-  ];
+  <script>
+    const colors = [
+      {
+        name: "سفید صدفی",
+        formula: "۸۰٪ سفید + ۱۰٪ خاکستری + ۱۰٪ بژ",
+        architect: "سفید صدفی فضا را بزرگ‌تر و نورانی‌تر نشان می‌دهد، مناسب فضاهای مینیمال و مدرن است.",
+        painter: "برای تابلوهای آرام‌بخش یا پس‌زمینه‌های لطیف عالی است. حس پاکی و صلح منتقل می‌کند."
+      },
+      {
+        name: "سفید یخچالی",
+        formula: "۱۰۰٪ سفید",
+        architect: "سرد و رسمی. برای دفاتر یا آشپزخانه‌های مدرن مناسب است.",
+        painter: "رنگ خالص برای کنتراست قوی در نقاشی‌های سورئال یا مینیمال استفاده می‌شود."
+      },
+      {
+        name: "خاکستری گرم",
+        formula: "۵۰٪ خاکستری + ۳۰٪ بژ + ۲۰٪ سفید",
+        architect: "برای فضاهایی با نور طبیعی کم پیشنهاد می‌شود. خنثی اما صمیمی است.",
+        painter: "برای پس‌زمینه‌های خنثی با حس زندگی، عالی است."
+      },
+      {
+        name: "خاکستری سرد",
+        formula: "۷۰٪ خاکستری + ۳۰٪ آبی",
+        architect: "القاء حس مدرنیته و سکوت. مناسب دفاتر کار.",
+        painter: "برای آثار انتزاعی، افکت یخ و مه کاربردی است."
+      },
+      {
+        name: "زرد لیمویی",
+        formula: "۷۰٪ زرد + ۳۰٪ سفید",
+        architect: "شاد، جوان و مناسب اتاق کودک یا آشپزخانه.",
+        painter: "در نقاشی انرژی و شادی منتقل می‌کند."
+      },
+      {
+        name: "زرد خردلی",
+        formula: "۶۰٪ زرد + ۳۰٪ قهوه‌ای + ۱۰٪ نارنجی",
+        architect: "جذاب و کلاسیک برای نشیمن یا کافه.",
+        painter: "برای نمایش قدرت، قدیمی بودن یا حس نوستالژی."
+      },
+      {
+        name: "آبی نفتی",
+        formula: "۶۰٪ آبی + ۳۰٪ مشکی + ۱۰٪ خاکستری",
+        architect: "عمق و تمرکز. برای دیوار اصلی اتاق مطالعه.",
+        painter: "برای خلق آسمان شب یا دریاهای عمیق."
+      },
+      {
+        name: "آبی روشن",
+        formula: "۸۰٪ سفید + ۲۰٪ آبی",
+        architect: "آرامش و فضای باز. مناسب اتاق خواب.",
+        painter: "برای آسمان و فضای باز کاربردی است."
+      },
+      {
+        name: "سبز زیتونی",
+        formula: "۷۰٪ سبز + ۳۰٪ قهوه‌ای",
+        architect: "طبیعت و صمیمیت. مناسب فضاهای سنتی یا سبک بوهو.",
+        painter: "برای برگ، طبیعت یا پس‌زمینه خاکی."
+      },
+      {
+        name: "سبز نعنایی",
+        formula: "۷۰٪ سبز + ۳۰٪ سفید",
+        architect: "طراوت و سبکی. برای حمام یا آشپزخانه عالی است.",
+        painter: "برای آثار شاد و جوان‌پسند."
+      },
+      {
+        name: "قرمز آجری",
+        formula: "۶۰٪ قرمز + ۳۰٪ قهوه‌ای + ۱۰٪ مشکی",
+        architect: "برای فضاهای سنتی، رستوران یا دیوار شاخص.",
+        painter: "برای خلق حس گرما و انرژی."
+      },
+      {
+        name: "قرمز گیلاسی",
+        formula: "۸۰٪ قرمز + ۲۰٪ آبی",
+        architect: "احساسی و رمانتیک. مناسب اتاق خواب یا سالن.",
+        painter: "برای نشان دادن شور و عشق."
+      },
+      {
+        name: "نارنجی هلویی",
+        formula: "۶۰٪ نارنجی + ۳۰٪ سفید + ۱۰٪ صورتی",
+        architect: "دل‌نشین و ملایم. مناسب اتاق کودک.",
+        painter: "برای سبک‌های مدرن یا کودکانه."
+      },
+      {
+        name: "بنفش یاسی",
+        formula: "۷۰٪ بنفش + ۳۰٪ سفید",
+        architect: "لوکس و روحانی. برای نشیمن یا سالن آرایش.",
+        painter: "برای حال و هوای رمانتیک و فانتزی."
+      },
+      {
+        name: "صورتی چرک",
+        formula: "۶۰٪ صورتی + 30٪ خاکستری + ۱۰٪ قهوه‌ای",
+        architect: "ملایم، مناسب فضاهای زنانه.",
+        painter: "برای رمانتیسیسم یا سبک نئو کلاسیک."
+      },
+      {
+        name: "قهوه‌ای نسکافه‌ای",
+        formula: "۷۰٪ قهوه‌ای + ۲۰٪ سفید + ۱۰٪ زرد",
+        architect: "گرم و صمیمی. برای نشیمن، آشپزخانه یا اتاق خواب.",
+        painter: "برای پس‌زمینه یا ترکیب با طلایی."
+      },
+      {
+        name: "طلایی",
+        formula: "۸۰٪ زرد + ۲۰٪ قهوه‌ای",
+        architect: "شکوه و تجمل. برای اکسسوری یا دیوار تاکیدی.",
+        painter: "برای نماد قدرت و سلطنت."
+      },
+      {
+        name: "نقره‌ای",
+        formula: "۷۰٪ خاکستری + ۳۰٪ سفید",
+        architect: "مدرن و تکنولوژیک. مناسب فضاهای لوکس.",
+        painter: "برای جزئیات فلزی، اشیاء مکانیکی یا سبک سایبر."
+      },
+      {
+        name: "بژ روشن",
+        formula: "۶۰٪ سفید + ۳۰٪ قهوه‌ای + ۱۰٪ زرد",
+        architect: "نورگیر، برای اتاق نشیمن یا فضای پذیرایی.",
+        painter: "برای نمایش بافت طبیعی یا بدن انسان."
+      },
+      {
+        name: "لاجوردی",
+        formula: "۷۰٪ آبی + ۳۰٪ بنفش",
+        architect: "اصیل و عمیق. برای سالن یا فضای هنری.",
+        painter: "برای القای حس مرموز یا لوکس."
+      }
+    ];
 
-  const colorListEl = document.getElementById('colorList');
-  const selectedColorEl = document.getElementById('selectedColor');
-  const colorBoxEl = document.getElementById('colorBox');
-  const selectedColorNameEl = document.getElementById('selectedColorName');
-  const colorCompositionEl = document.getElementById('colorComposition');
-  const colorDetailsEl = document.getElementById('colorDetails');
-  const colorSuggestionsEl = document.getElementById('colorSuggestions');
+    function renderColors(filter = '') {
+      const container = document.getElementById('colorCards');
+      container.innerHTML = '';
+      const filtered = colors.filter(c => c.name.includes(filter));
+      filtered.forEach(c => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <h2 class="text-xl font-semibold mb-2">${c.name}</h2>
+          <p><strong>فرمول ساخت:</strong> ${c.formula}</p>
+          <details class="mt-2">
+            <summary class="cursor-pointer text-blue-600">روان‌شناسی برای معمار</summary>
+            <p class="mt-1 text-sm">${c.architect}</p>
+          </details>
+          <details class="mt-2">
+            <summary class="cursor-pointer text-green-600">روان‌شناسی برای نقاش</summary>
+            <p class="mt-1 text-sm">${c.painter}</p>
+          </details>
+        `;
+        container.appendChild(card);
+      });
+    }
 
-  function createColorCard(color) {
-    const card = document.createElement('div');
-    card.className = 'color-card';
-    card.onclick = () => showColorDetails(color);
-
-    const swatch = document.createElement('div');
-    swatch.className = 'color-swatch';
-    swatch.style.backgroundColor = color.hex;
-    card.appendChild(swatch);
-
-    const name = document.createElement('div');
-    name.className = 'color-name';
-    name.textContent = color.name;
-    card.appendChild(name);
-
-    return card;
-  }
-
-  function showColorDetails(color) {
-    selectedColorEl.style.display = 'block';
-    colorBoxEl.style.background = color.hex;
-    selectedColorNameEl.textContent = color.name;
-
-    // ترکیب رنگ‌ها به صورت متن
-    let compText = '';
-    color.composition.forEach(c => {
-      compText += `${c.percent}% ${c.color} (${c.hex})\n`;
+    document.getElementById('searchInput').addEventListener('input', e => {
+      renderColors(e.target.value);
     });
-    colorCompositionEl.textContent = compText.trim();
 
-    colorDetailsEl.textContent = color.details;
-    colorSuggestionsEl.textContent = `پیشنهاد: ${color.suggestions}`;
-
-    // اسکرول به سمت پایین برای دیدن جزییات
-    selectedColorEl.scrollIntoView({behavior: 'smooth'});
-  }
-
-  // بارگذاری کارت‌ها
-  colors.forEach(color => {
-    const card = createColorCard(color);
-    colorListEl.appendChild(card);
-  });
-</script>
-
+    renderColors();
+  </script>
 </body>
+
 </html>
